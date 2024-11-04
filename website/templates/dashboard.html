@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Meta tags and external libraries (Chart.js, Bootstrap, etc.) -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        crossorigin="anonymous"
+    />
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        crossorigin="anonymous"
+    />
+   
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        #chart_div {
+            width: 100%;
+            height: 600px;
+            margin-bottom: 60px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        setTimeout(function() {
+            location.reload();
+        }, 2000); // 2000 milliseconds = 2 seconds
+    </script> 
+    
+    <!-- Navigation bar and title -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar"></div>
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" id="logout" href="/chart">Chart</a>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+            </div>
+        </div>
+        
+    </nav>
+   
+    
+    <div class="container">
+        <center><h1>WATER QUALITY MONITORING SYSTEM</h1></center>
+        <div class="row">
+            <div class="col-md-6">
+                
+                <br><br><br><br>
+                <img src="../static/drop.gif" height="500" width="500" class="img-fluid">
+            </div>
+            
+            <div class="col-md-6">
+                <br><br><br><br>
+                <h2>Data Collected</h2><br><br>
+                {% if data %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>Key</th>
+                        <th>Value</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Time</td>
+                            <td>{{ formatted_time }}</td>
+                        </tr>
+                        <tr>
+                            <td>TDS</td>
+                            <td>{{ data.TDS }} ppm</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% else %}
+                        <p>No data available.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="chart_div" style="width: 100%; height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+
+       
+
+  
+        
+
+        
+
+        
+
+    </script>
+
+    <!-- Additional JavaScript (Bootstrap, Popper) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

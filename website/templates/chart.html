@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Meta tags and external libraries (Chart.js, Bootstrap, etc.) -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        crossorigin="anonymous"
+    />
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        crossorigin="anonymous"
+    />
+    <title>Water Quality Monitoring System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        #chart_div {
+            width: 100%;
+            height: 600px;
+            margin-bottom: 60px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar and title -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar"></div>
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" id="logout" href="/dashboard">Dashboard</a>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+            </div>
+        </div>
+        
+    </nav>
+    <center><h1>Graph</h1></center>
+    
+    <!-- Data Table and Chart Container -->
+    <div class="container">
+        <div class="row">
+            
+            <div class="col-md-6">
+                
+                <table class="table table-bordered" hidden>
+                    <thead>
+                        <tr><th>Key</th><th>Value</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Time</td><td id="latestTime">Loading...</td></tr>
+                        <tr><td>TDS</td><td id="latestTDS">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="chart_div" style="width: 100%; height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(initChart);
+
+        var dataTable;
+
+        function formatDateTime(timestamp) {
+            const [date, time] = timestamp.split(' ');
+            const [year, month, day] = date.split('-');
+            const timeStr = time.substring(0, 5);
+            return `${day}/${month}/${year}\n${timeStr}`;
+        }
+
+        function initChart() {
+            dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Date/Time');
+            dataTable.addColumn('number', 'TDS (ppm)');
+            const realData = JSON.parse('{{ data|tojson|safe }}');
+            
+            realData.forEach(function(reading) {
+                const formattedDateTime = formatDateTime(reading.timestamp);
+                dataTable.addRow([formattedDateTime, reading.tds]);
+            });
+            drawChart();
+        }
+
+        function drawChart() {
+            var options = {
+                title: 'TDS Over Time',
+                hAxis: { title: 'Date/Time', slantedText: false, textStyle: { fontSize: 12, bold: true } },
+                vAxis: { title: 'TDS (ppm)', minValue: 0 },
+                legend: 'none',
+                height: 500,
+                colors: ['#2196F3'],
+                curveType: 'function',
+                chartArea: { width: '75%', height: '70%' },
+                pointSize: 5,
+                lineWidth: 3,
+            };
+            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+        }
+
+        // Define fetchTDSData to get the latest data from the server every 5 seconds
+        function fetchTDSData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    const timestamp = data.timestamp;
+                    const tds = parseFloat(data.tds);
+
+                    // Update the data in the table
+                    document.getElementById('latestTime').innerText = timestamp;
+                    document.getElementById('latestTDS').innerText = tds;
+
+                    // Add new data point to the chart
+                    updateChart(formatDateTime(timestamp), tds);
+                })
+                .catch(error => console.error('Error fetching TDS data:', error));
+        }
+
+        function updateChart(label, tdsValue) {
+            dataTable.addRow([label, tdsValue]);
+            if (dataTable.getNumberOfRows() > 20) {
+                dataTable.removeRow(0); // Keep only the last 20 points
+            }
+            drawChart();
+        }
+
+        // Fetch data every 5 seconds
+        setInterval(fetchTDSData, 5000);
+    </script>
+
+    <!-- Additional JavaScript (Bootstrap, Popper) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
