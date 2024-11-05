@@ -6,7 +6,7 @@ from os import path
 from decimal import Decimal
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
-from decouple import config  # Import decouple
+from decouple import config
 
 # Load Firebase credentials from environment variable
 cred = credentials.Certificate(config('FIREBASE_CREDENTIALS_PATH'))
